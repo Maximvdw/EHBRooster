@@ -45,18 +45,45 @@ public class Day {
 			if (presentActivity.getBeginTimeUnix() == activity.getBeginTimeUnix()
 					&& presentActivity.getEndTimeUnix() == activity.getEndTimeUnix()
 					&& presentActivity.getLector().equals(activity.getLector())) {
+				if (!presentActivity.getName().equals(activity.getName()) && ((!presentActivity.getLector().equals("")
+						&& !presentActivity.getLector().equals(" ") && !presentActivity.getLector().equals(" ")))) {
+					// Console.warning(
+					// "Possible conflict: " + presentActivity.getName() + " ["
+					// + presentActivity.getId() + "]");
+				}
 				if (((!presentActivity.getLector().equals("") && !presentActivity.getLector().equals(" ")
 						&& !presentActivity.getLector().equals(" ")))
 						|| presentActivity.getName().equalsIgnoreCase(activity.getName())) {
+					boolean edited = false;
+					if (presentActivity.getSyncDate() < ScheduleManager.getInstance().getTimeTable().getLastSync()) {
+						presentActivity.getSubjects().clear();
+						presentActivity.getStudyProgrammes().clear();
+						presentActivity.setGroups(activity.getGroups());
+						presentActivity.setClassRoom(activity.getClassRoom());
+						presentActivity.setName(activity.getName());
+						presentActivity.setWeeks(activity.getWeeks());
+					}
 					if (presentActivity.getName().length() < activity.getName().length()) {
 						presentActivity.setName(activity.getName());
+						edited = true;
 					}
 					if (!presentActivity.getGroups().contains(activity.getGroups())) {
 						presentActivity.setGroups(presentActivity.getGroups() + "," + activity.getGroups());
+						edited = true;
 					}
 					presentActivity.setSyncDate(activity.getSyncDate());
+					int subjectCount = presentActivity.getSubjects().size();
+					int studyProgramCount = presentActivity.getStudyProgrammes().size();
 					presentActivity.addSubjects(activity.getSubjects());
 					presentActivity.addStudyProgram(activity.getStudyProgrammes());
+					if (subjectCount != presentActivity.getSubjects().size()) {
+						edited = true;
+					}
+					if (studyProgramCount != presentActivity.getStudyProgrammes().size()) {
+						edited = true;
+					}
+					if (edited)
+						presentActivity.setLastUpdate(System.currentTimeMillis() / 1000);
 					setSyncDate(System.currentTimeMillis() / 1000);
 					activities.set(i, presentActivity);
 					return this;

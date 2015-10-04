@@ -42,6 +42,7 @@ public class Activity {
 	private String groups = "";
 	private String duration = "";
 	private long syncDate = 0L;
+	private long lastUpdate = 0L;
 
 	public Activity() {
 
@@ -52,6 +53,7 @@ public class Activity {
 		setDay(day);
 		setSyncDate(System.currentTimeMillis() / 1000);
 		setWeeks(weeks);
+		setLastUpdate(getSyncDate());
 		setDuration(duration);
 		setName(name.equals("&nbsp;") ? "" : name);
 		if (name.equals("")) {
@@ -232,5 +234,13 @@ public class Activity {
 
 	public void setStudyProgrammes(List<StudyProgram> studyProgrammes) {
 		this.studyProgrammes = studyProgrammes;
+	}
+
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(long lastUpdate) {
+		this.lastUpdate = lastUpdate;
 	}
 }

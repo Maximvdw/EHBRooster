@@ -6,6 +6,7 @@ import java.util.List;
 import be.maximvdw.ehbrooster.config.Configuration;
 import be.maximvdw.ehbrooster.schedule.Education;
 import be.maximvdw.ehbrooster.schedule.Group;
+import be.maximvdw.ehbrooster.schedule.Lector;
 import be.maximvdw.ehbrooster.schedule.ScheduleManager;
 import be.maximvdw.ehbrooster.schedule.StudyProgram;
 import be.maximvdw.ehbrooster.schedule.Subject;
@@ -83,6 +84,9 @@ public class EHBRooster {
 
 		Console.info("Caching all study programmes ...");
 		getManager().getProgrammes(true);
+
+		Console.info("Caching all lectors ...");
+		final List<Lector> lectors = getManager().getLectors(true);
 
 		Console.info("Loading groups ...");
 		// Get 1st year Digix
@@ -580,6 +584,49 @@ public class EHBRooster {
 		}
 		// Save all groups to database
 		getManager().saveGroups(groups);
+
+		threadPool = new ArrayList<Thread>();
+		for (int week = startSyncWeek; week <= endSyncWeek; week++) {
+			final int currentWeek = week;
+			Thread t = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					boolean success = false;
+					while (!success) {
+						Console.info("Getting lectors time table for week: " + currentWeek);
+						success = getManager().fetchLectorTimeTable(currentWeek, lectors);
+						if (!success) {
+							Console.warning("Retrying week: " + currentWeek);
+						}
+					}
+				}
+
+			});
+			t.start();
+			threadPool.add(t);
+			if (threadPool.size() >= 2) {
+				while (threadPool.size() >= 1) {
+					List<Thread> shadedThreadPool = new ArrayList<Thread>(threadPool);
+					for (Thread thread : shadedThreadPool) {
+						if (!thread.isAlive()) {
+							threadPool.remove(thread);
+						}
+					}
+				}
+			}
+			System.gc();
+		}
+
+		while (threadPool.size() != 0) {
+			List<Thread> shadedThreadPool = new ArrayList<Thread>(threadPool);
+			for (Thread thread : shadedThreadPool) {
+				if (!thread.isAlive()) {
+					threadPool.remove(thread);
+				}
+			}
+		}
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -589,7 +636,7 @@ public class EHBRooster {
 
 		long syncEndTime = System.currentTimeMillis();
 		Sync sync = new Sync(syncEndTime, 0, 0, syncEndTime - syncStartTime);
-		
+
 		// Check for changes
 		Console.info("Synchronizing time table ...");
 		getManager().saveTimeTable(sync);

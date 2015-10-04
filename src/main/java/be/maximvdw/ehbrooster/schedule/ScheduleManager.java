@@ -37,6 +37,7 @@ public class ScheduleManager {
 	private List<Department> departments = new ArrayList<Department>();
 	private List<Education> educations = new ArrayList<Education>();
 	private List<StudyProgram> programmes = new ArrayList<StudyProgram>();
+	private List<Lector> lectors = new ArrayList<Lector>();
 	private TimeTable timeTable = null;
 	private EntityManagerFactory managerFactory = null;
 	private EntityManager entityManager = null;
@@ -93,11 +94,18 @@ public class ScheduleManager {
 			programmes.add(entityManager.find(StudyProgram.class, id));
 		}
 
+		Query lectorQuery = entityManager.createQuery("SELECT id FROM lectors");
+		Collection<Integer> lectorIds = lectorQuery.getResultList();
+		for (Integer id : lectorIds) {
+			lectors.add(entityManager.find(Lector.class, id));
+		}
+
 		Query tableQuery = entityManager.createQuery("SELECT id FROM timetable");
 		Collection<Integer> tableIds = tableQuery.getResultList();
 		for (Integer id : tableIds) {
 			timeTable = entityManager.find(TimeTable.class, id);
 		}
+
 	}
 
 	public void clear() {
@@ -265,6 +273,104 @@ public class ScheduleManager {
 			entityManager.getTransaction().commit();
 		} catch (Throwable ex) {
 			ex.printStackTrace();
+		}
+	}
+
+	public boolean fetchLectorTimeTable(int week, List<Lector> lectors) {
+		Collections.sort(lectors);
+		try {
+			Connection.Response res = null;
+
+			// Get cookies again if lost
+			res = Jsoup.connect(EHBRooster.getBaseURL()).timeout(60000).method(Method.GET).execute();
+			if (res == null) {
+				Console.warning("Unable to get EHB groups from site!");
+			}
+			Document docCookieFetch = res.parse();
+			if (docCookieFetch == null) {
+				Console.warning("Unable to get EHB groups from site!");
+			}
+
+			// Required for cookie saving
+			String VIEWSTATE = docCookieFetch.getElementById("__VIEWSTATE").attr("value");
+			String EVENTVALIDATION = (docCookieFetch.getElementById("__EVENTVALIDATION").attr("value"));
+			Map<String, String> cookies = res.cookies();
+
+			res = Jsoup.connect(EHBRooster.getBaseURL()).timeout(60000).data("__EVENTTARGET", "LinkBtn_Staff")
+					.data("__EVENTARGUMENT", "").data("__LASTFOCUS", "").data("__VIEWSTATE", VIEWSTATE)
+					.data("__EVENTVALIDATION", EVENTVALIDATION).data("tLinkType", "ProgrammesOfStudy")
+					.data("dlFilter", "").data("tWildcard", "").data("lbWeeks", "t").data("lbDays", "1-7")
+					.data("dlPeriod", "1-56").data("RadioType", "Individual%3Bswsurl%3BSWS_EHB_IND").cookies(cookies)
+					.method(Method.POST).execute();
+			Document doc = res.parse();
+			if (doc == null) {
+				Console.warning("Unable to get subjects from site [#1]!");
+				return false;
+			}
+
+			VIEWSTATE = doc.getElementById("__VIEWSTATE").attr("value");
+			EVENTVALIDATION = doc.getElementById("__EVENTVALIDATION").attr("value");
+			Connection conn = Jsoup.connect(EHBRooster.getBaseURL()).timeout(60000).data("__EVENTTARGET", "")
+					.data("__EVENTARGUMENT", "").data("__LASTFOCUS", "").data("__VIEWSTATE", VIEWSTATE)
+					.data("__EVENTVALIDATION", EVENTVALIDATION).data("tLinkType", "Staff").data("dlFilter", "")
+					.data("tWildcard", "").data("lbWeeks", " " + week).data("lbDays", "1-7").data("dlPeriod", "1-56")
+					.data("RadioType", "TextSpreadsheet;swsurl;SWS_EHB_TS").data("bGetTimetable", "Toon+rooster")
+					.data("pDays", "1-7").cookies(cookies).method(Method.POST);
+			for (Lector lector : lectors) {
+				conn.data("dlObject", lector.getLectorId());
+			}
+
+			res = conn.execute();
+			doc = res.parse();
+			if (doc == null) {
+				Console.warning("Unable to get timetable for week '" + (week) + "' from site [#2]!");
+				return false;
+			}
+
+			HtmlResponse getResponse = HtmlUtils.sendGetRequest(EHBRooster.getBaseTimeTableURL(), cookies, 120000);
+			Document timeTableDoc = Jsoup.parse(getResponse.getSource());
+			List<Element> dayTables = timeTableDoc.getElementsByClass("spreadsheet");
+			List<Element> subjectTitleElements = timeTableDoc.getElementsByClass("header-2-0-1");
+			TimeTable timeTable = ScheduleManager.getInstance().getTimeTable();
+			Week weekTimeTable = timeTable.getWeek(week);
+			for (int subjectNr = 0; subjectNr < lectors.size(); subjectNr++) {
+				// Lector lectorObj = lectors.get(subjectNr);
+				subjectTitleElements.get(subjectNr).text();
+				for (int i = 1; i <= 7; i++) {
+					Element dayTable = dayTables.get(i - 1 + (subjectNr * 7));
+					Day dayTimeTable = weekTimeTable.getWeekDay(i);
+					if (dayTable.getElementsByTag("tbody").size() != 0) {
+						Element tbodyElement = dayTable.getElementsByTag("tbody").first();
+						List<Element> rows = tbodyElement.getElementsByTag("tr");
+						for (int row = 1; row < rows.size(); row++) {
+							Element rowElement = rows.get(row);
+							List<Element> columnElements = rowElement.getElementsByTag("td");
+							if (columnElements.size() == 9) {
+								String activity = columnElements.get(0).text();
+								String lessonForm = columnElements.get(1).text();
+								String begin = columnElements.get(2).text();
+								String end = columnElements.get(3).text();
+								if (!begin.contains(":") || !end.contains(":")) {
+									Console.severe("ERROR: " + activity + " NPE BEGIN/END DATE");
+								}
+								String duration = columnElements.get(4).text();
+								String weeks = columnElements.get(5).text();
+								String lector = columnElements.get(6).text();
+								String classRoom = columnElements.get(7).text();
+								String groupsString = columnElements.get(8).text();
+								Activity activityObj = new Activity(null, activity, lessonForm, begin, end, duration,
+										weeks, lector, classRoom, groupsString, dayTimeTable);
+								dayTimeTable.addActivity(activityObj);
+							}
+						}
+					}
+				}
+			}
+			return true;
+		} catch (Exception ex) {
+			Console.warning("Unable to get timetable for week '" + (week) + "' from site [#3]!");
+			ex.printStackTrace();
+			return false;
 		}
 	}
 
@@ -729,5 +835,74 @@ public class ScheduleManager {
 
 	public void setProgrammes(List<StudyProgram> programmes) {
 		this.programmes = programmes;
+	}
+
+	public List<Lector> getLectors(boolean force) {
+		if (lectors.isEmpty() || force) {
+			List<Lector> currentLectors = new ArrayList<Lector>(lectors);
+			try {
+				Connection.Response res = Jsoup.connect(EHBRooster.getBaseURL()).timeout(60000).method(Method.GET)
+						.execute();
+				if (res == null) {
+					Console.warning("Unable to get EHB lectors from site!");
+					return lectors;
+				}
+				Document docCookieFetch = res.parse();
+				if (docCookieFetch == null) {
+					Console.warning("Unable to get EHB lectors from site!");
+					return lectors;
+				}
+
+				// Required for cookie saving
+				String VIEWSTATE = docCookieFetch.getElementById("__VIEWSTATE").attr("value");
+				String EVENTVALIDATION = docCookieFetch.getElementById("__EVENTVALIDATION").attr("value");
+				Map<String, String> cookies = res.cookies();
+				Document doc = Jsoup.connect(EHBRooster.getBaseURL()).timeout(60000)
+						.data("__EVENTTARGET", "LinkBtn_Staff").data("__EVENTARGUMENT", "").data("__LASTFOCUS", "")
+						.data("__VIEWSTATE", VIEWSTATE).data("__EVENTVALIDATION", EVENTVALIDATION)
+						.data("tLinkType", "ProgrammesOfStudy").data("dlFilter", "").data("tWildcard", "")
+						.data("lbWeeks", "t").data("lbDays", "1-7").data("pDays", "1-7").data("dlPeriod", "1-56")
+						.data("RadioType", "Individual;swsurl;SWS_EHB_IND").cookies(cookies).post();
+				if (doc == null) {
+					Console.warning("Unable to get EHB lectors from site!");
+					return lectors;
+				}
+				// Jsoup doet lastig met grote lijsten....
+
+				HtmlResponse getResponse = HtmlUtils.sendGetRequest(EHBRooster.getBaseURL(), cookies, 60000);
+				doc = Jsoup.parse(getResponse.getSource());
+
+				Element selectElement = doc.getElementById("dlObject");
+				List<Element> optionElements = selectElement.children();
+				int idx = 0;
+				for (Element optionElement : optionElements) {
+					Lector lector = new Lector(optionElement.text(), optionElement.attr("value"));
+					lector.setListIndex(idx);
+					boolean exists = false;
+					for (Lector currentLector : currentLectors) {
+						if (currentLector.getLectorId().equals(lector.getLectorId())) {
+							exists = true;
+							if (currentLector.getListIndex() != lector.getListIndex()) {
+								Console.warning("Arrangement of lectors changed on official time schedule!");
+								currentLector.setListIndex(lector.getListIndex());
+							}
+							break;
+						}
+					}
+					if (!exists)
+						lectors.add(lector);
+
+					idx++;
+				}
+			} catch (Exception ex) {
+				Console.warning("Unable to get lectors from site [#3]!");
+				ex.printStackTrace();
+			}
+		}
+		return lectors;
+	}
+
+	public void setLectors(List<Lector> lectors) {
+		this.lectors = lectors;
 	}
 }
