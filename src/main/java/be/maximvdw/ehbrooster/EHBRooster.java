@@ -35,7 +35,7 @@ public class EHBRooster {
 		int port = Configuration.getInt("port");
 
 		Console.info("=====================================");
-		Console.info(" EHBRooster Converter v1.4");
+		Console.info(" EHBRooster Converter v1.5");
 		Console.info(" (c) Maxim Van de Wynckel 2015-2015");
 		Console.info("=====================================");
 
@@ -59,7 +59,7 @@ public class EHBRooster {
 		}
 		int startSyncWeek = currentWeekNumber;
 		if (startSyncWeek >= 3) {
-			startSyncWeek = startSyncWeek - 2;
+			startSyncWeek = startSyncWeek - 1;
 		} else {
 			startSyncWeek = 1;
 		}
@@ -69,7 +69,6 @@ public class EHBRooster {
 		}
 
 		startSyncWeek = 1;
-
 		Console.info("Creating departments");
 		getManager().createDepartment("Design & Technologie", "DT");
 		getManager().createDepartment("Onderwijs & Pedagogie", "EDU");
@@ -136,38 +135,6 @@ public class EHBRooster {
 			g.setEducation(multec3EDU);
 		}
 		groups.addAll(multec3);
-		// // Get 1st year AN
-		// List<Group> an1 = getManager().getGroupsByName("1/Ba AN");
-		// Education an1EDU = getManager().createEducation("1 Ba Audiovisuele
-		// Kunsten", "RITCS");
-		// for (Group g : an1) {
-		// g.setEducation(an1EDU);
-		// }
-		// groups.addAll(an1);
-		// // Get 2nd year AN
-		// List<Group> an2 = getManager().getGroupsByName("2/Ba AN");
-		// Education an2EDU = getManager().createEducation("2 Ba Audiovisuele
-		// Kunsten", "RITCS");
-		// for (Group g : an2) {
-		// g.setEducation(an2EDU);
-		// }
-		// groups.addAll(an2);
-		// // Get 3rd year AN
-		// List<Group> an3 = getManager().getGroupsByName("3/Ba AN");
-		// Education an3EDU = getManager().createEducation("3 Ba Audiovisuele
-		// Kunsten", "RITCS");
-		// for (Group g : an3) {
-		// g.setEducation(an3EDU);
-		// }
-		// groups.addAll(an3);
-		// // Get master year AN
-		// List<Group> anM = getManager().getGroupsByName("Ma AN");
-		// Education anMEDU = getManager().createEducation("Master Audiovisuele
-		// Kunsten", "RITCS");
-		// for (Group g : anM) {
-		// g.setEducation(anMEDU);
-		// }
-		// groups.addAll(anM);
 		// Get 1st year Drama - Regie
 		List<Group> draReg1 = getManager().getGroupsByName("1/Ba Reg");
 		Education draReg1EDU = getManager().createEducation("1 Ba in het Drama - Regie", "RITCS");
@@ -291,6 +258,11 @@ public class EHBRooster {
 		akM1.setEducation(ak1EDU);
 		akM1.setAlias("1 Ba AK - Montage");
 		groups.add(akM1);
+		Group akD1 = getManager().getGroupByName("1/Ba D");
+		akD1.setName("1/Ba D");
+		akD1.setEducation(ak1EDU);
+		akD1.setAlias("1 Ba AK - FILM, TV, DOC, SCHRIJVEN");
+		groups.add(akD1);
 		// Get 2 AK
 		Education ak2EDU = getManager().createEducation("2 Ba Audiovisuele Kunsten", "RITCS");
 		Group akRadio2 = getManager().getGroupByName("2/Radio"); // OK
@@ -317,6 +289,11 @@ public class EHBRooster {
 		akM2.setEducation(ak2EDU);
 		akM2.setAlias("2 Ba AK - Montage");
 		groups.add(akM2);
+		Group akD2 = getManager().getGroupByName("2/Ba D");
+		akD2.setName("2/Ba D");
+		akD2.setEducation(ak2EDU);
+		akD2.setAlias("2 Ba AK - FILM, TV, DOC, SCHRIJVEN");
+		groups.add(akD2);
 		// Get 3 AK
 		Education ak3EDU = getManager().createEducation("3 Ba Audiovisuele Kunsten", "RITCS");
 		Group akRadio3 = getManager().getGroupByName("3/Radio"); // OK
@@ -343,6 +320,26 @@ public class EHBRooster {
 		akM3.setEducation(ak3EDU);
 		akM3.setAlias("3 Ba AK - Montage");
 		groups.add(akM3);
+		Group akD3 = getManager().getGroupByName("3/Ba D");
+		akD3.setName("3/Ba D");
+		akD3.setEducation(ak3EDU);
+		akD3.setAlias("3 Ba AK - Documentaire");
+		groups.add(akD3);
+		Group akTV3 = getManager().getGroupByName("3/Ba T-TA");
+		akTV3.setName("3/Ba T-TA");
+		akTV3.setEducation(ak3EDU);
+		akTV3.setAlias("3 Ba AK - TV");
+		groups.add(akTV3);
+		Group akS3 = getManager().getGroupByName("3/Ba S");
+		akS3.setName("3/Ba S");
+		akS3.setEducation(ak3EDU);
+		akS3.setAlias("3 Ba AK - Schrijven");
+		groups.add(akS3);
+		Group akF3 = getManager().getGroupByName("3/Ba F-TA");
+		akF3.setName("3/Ba F-TA");
+		akF3.setEducation(ak3EDU);
+		akF3.setAlias("3 Ba AK - Film");
+		groups.add(akF3);
 
 		Console.info("Preparing to get timetables for " + groups.size() + " groups ...");
 		Console.info("Creating cache of all subjects ...");
@@ -358,6 +355,153 @@ public class EHBRooster {
 			Console.info("Saving group: " + group.getName());
 			getManager().saveGroup(group);
 		}
+		
+		final List<StudyProgram> studyProgrammes = new ArrayList<StudyProgram>();
+		StudyProgram podium1 = getManager().getStudyProgramByName("1 Ba Podiumtechnieken");
+		podium1.setGroups(pt1);
+		getManager().saveStudyProgram(podium1);
+		studyProgrammes.add(podium1);
+
+		StudyProgram podium2 = getManager().getStudyProgramByName("2 Ba Podiumtechnieken");
+		podium2.setGroups(pt2);
+		getManager().saveStudyProgram(podium2);
+		studyProgrammes.add(podium2);
+
+		StudyProgram podium3 = getManager().getStudyProgramByName("3 Ba Podiumtechnieken");
+		podium3.setGroups(pt3);
+		getManager().saveStudyProgram(podium3);
+		studyProgrammes.add(podium3);
+
+		StudyProgram draAct1Program = getManager().getStudyProgramByName("1 Ba in het Drama - Acteren");
+		draAct1Program.setGroups(draAct1);
+		getManager().saveStudyProgram(draAct1Program);
+		studyProgrammes.add(draAct1Program);
+
+		StudyProgram draAct2Program = getManager().getStudyProgramByName("2 Ba in het Drama - Acteren");
+		draAct2Program.setGroups(draAct2);
+		getManager().saveStudyProgram(draAct2Program);
+		studyProgrammes.add(draAct2Program);
+
+		StudyProgram draAct3Program = getManager().getStudyProgramByName("3 Ba in het Drama - Acteren");
+		draAct3Program.setGroups(draAct3);
+		getManager().saveStudyProgram(draAct3Program);
+		studyProgrammes.add(draAct3Program);
+
+		StudyProgram draActMaProgram = getManager().getStudyProgramByName("Ma in het Drama - Acteren");
+		draActMaProgram.setGroups(draActMA);
+		getManager().saveStudyProgram(draActMaProgram);
+		studyProgrammes.add(draActMaProgram);
+
+		StudyProgram draReg1Program = getManager().getStudyProgramByName("1 Ba in het Drama - Regie");
+		draReg1Program.setGroups(draReg1);
+		getManager().saveStudyProgram(draReg1Program);
+		studyProgrammes.add(draReg1Program);
+
+		StudyProgram draReg2Program = getManager().getStudyProgramByName("2 Ba in het Drama - Regie");
+		draReg2Program.setGroups(draReg2);
+		getManager().saveStudyProgram(draReg2Program);
+		studyProgrammes.add(draReg2Program);
+
+		StudyProgram draReg3Program = getManager().getStudyProgramByName("3 Ba in het Drama - Regie");
+		draReg3Program.setGroups(draReg3);
+		getManager().saveStudyProgram(draReg3Program);
+		studyProgrammes.add(draReg3Program);
+
+		StudyProgram draRegMaProgram = getManager().getStudyProgramByName("Ma in het Drama - Regie");
+		draRegMaProgram.setGroups(draRegMA);
+		getManager().saveStudyProgram(draRegMaProgram);
+		studyProgrammes.add(draRegMaProgram);
+
+		StudyProgram akRadio1Program = getManager().getStudyProgramByName("1 Ba AK - Radio");
+		akRadio1Program.addGroup(akRadio1);
+		getManager().saveStudyProgram(akRadio1Program);
+		studyProgrammes.add(akRadio1Program);
+
+		StudyProgram akASS1Program = getManager().getStudyProgramByName("1 Ba in de Audiovisuele Kunsten - ASS");
+		akASS1Program.addGroup(akASS1);
+		getManager().saveStudyProgram(akASS1Program);
+		studyProgrammes.add(akASS1Program);
+
+		StudyProgram akD1Program = getManager().getStudyProgramByName("1 Ba AK - Film - TV - DOC - SCHRIJVEN");
+		akD1Program.addGroup(akD1);
+		getManager().saveStudyProgram(akD1Program);
+		studyProgrammes.add(akD1Program);
+
+		StudyProgram akASS2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - ASS");
+		akASS2Program.addGroup(akASS2);
+		getManager().saveStudyProgram(akASS2Program);
+		studyProgrammes.add(akASS2Program);
+
+		StudyProgram akRadio2Program = getManager().getStudyProgramByName("2 Ba AK - Radio");
+		akRadio2Program.addGroup(akRadio2);
+		getManager().saveStudyProgram(akRadio2Program);
+		studyProgrammes.add(akRadio2Program);
+
+		StudyProgram akB2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Beeld");
+		akB2Program.addGroup(akB2);
+		getManager().saveStudyProgram(akB2Program);
+		studyProgrammes.add(akB2Program);
+
+		StudyProgram akG2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Geluid");
+		akG2Program.addGroup(akG2);
+		getManager().saveStudyProgram(akG2Program);
+		studyProgrammes.add(akG2Program);
+
+		StudyProgram akM2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Montage");
+		akM2Program.addGroup(akM2);
+		getManager().saveStudyProgram(akM2Program);
+		studyProgrammes.add(akM2Program);
+
+		StudyProgram akD2Program = getManager().getStudyProgramByName("2 Ba AK- Film - TV - DOC - Schrijven");
+		akD2Program.addGroup(akD2);
+		getManager().saveStudyProgram(akD2Program);
+		studyProgrammes.add(akD2Program);
+
+		StudyProgram akRadio3Program = getManager().getStudyProgramByName("3 Ba AK - Radio");
+		akRadio3Program.addGroup(akRadio3);
+		getManager().saveStudyProgram(akRadio3Program);
+		studyProgrammes.add(akRadio3Program);
+
+		StudyProgram akASS3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - ASS");
+		akASS3Program.addGroup(akASS3);
+		getManager().saveStudyProgram(akASS3Program);
+		studyProgrammes.add(akASS3Program);
+
+		StudyProgram akB3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Beeld");
+		akB3Program.addGroup(akB3);
+		getManager().saveStudyProgram(akB3Program);
+		studyProgrammes.add(akB3Program);
+
+		StudyProgram akG3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Geluid");
+		akG3Program.addGroup(akG3);
+		getManager().saveStudyProgram(akG3Program);
+		studyProgrammes.add(akG3Program);
+
+		StudyProgram akM3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Montage");
+		akM3Program.addGroup(akM3);
+		getManager().saveStudyProgram(akM3Program);
+		studyProgrammes.add(akM3Program);
+
+		StudyProgram akF3Program = getManager().getStudyProgramByName("3 Ba AK - Film");
+		akF3Program.addGroup(akF3);
+		getManager().saveStudyProgram(akF3Program);
+		studyProgrammes.add(akF3Program);
+
+		StudyProgram akS3Program = getManager().getStudyProgramByName("3 Ba AK - Schrijven");
+		akS3Program.addGroup(akS3);
+		getManager().saveStudyProgram(akS3Program);
+		studyProgrammes.add(akS3Program);
+
+		StudyProgram akTV3Program = getManager().getStudyProgramByName("3 Ba AK - TV");
+		akTV3Program.addGroup(akTV3);
+		getManager().saveStudyProgram(akTV3Program);
+		studyProgrammes.add(akTV3Program);
+
+		StudyProgram akD3Program = getManager().getStudyProgramByName("3 Ba AK - Documentaire");
+		akD3Program.addGroup(akD3);
+		getManager().saveStudyProgram(akD3Program);
+		studyProgrammes.add(akD3Program);
+		
 
 		List<Thread> threadPool = new ArrayList<Thread>();
 		for (int week = startSyncWeek; week <= endSyncWeek; week++) {
@@ -425,121 +569,6 @@ public class EHBRooster {
 			}
 		}
 
-		final List<StudyProgram> studyProgrammes = new ArrayList<StudyProgram>();
-		StudyProgram podium1 = getManager().getStudyProgramByName("1 Ba Podiumtechnieken");
-		podium1.setGroups(pt1);
-		getManager().saveStudyProgram(podium1);
-		studyProgrammes.add(podium1);
-
-		StudyProgram podium2 = getManager().getStudyProgramByName("2 Ba Podiumtechnieken");
-		podium2.setGroups(pt2);
-		getManager().saveStudyProgram(podium2);
-		studyProgrammes.add(podium2);
-
-		StudyProgram podium3 = getManager().getStudyProgramByName("3 Ba Podiumtechnieken");
-		podium3.setGroups(pt3);
-		getManager().saveStudyProgram(podium3);
-		studyProgrammes.add(podium3);
-
-		StudyProgram draAct1Program = getManager().getStudyProgramByName("1 Ba in het Drama - Acteren");
-		draAct1Program.setGroups(draAct1);
-		getManager().saveStudyProgram(draAct1Program);
-		studyProgrammes.add(draAct1Program);
-
-		StudyProgram draAct2Program = getManager().getStudyProgramByName("2 Ba in het Drama - Acteren");
-		draAct2Program.setGroups(draAct2);
-		getManager().saveStudyProgram(draAct2Program);
-		studyProgrammes.add(draAct2Program);
-
-		StudyProgram draAct3Program = getManager().getStudyProgramByName("3 Ba in het Drama - Acteren");
-		draAct3Program.setGroups(draAct3);
-		getManager().saveStudyProgram(draAct3Program);
-		studyProgrammes.add(draAct3Program);
-
-		StudyProgram draActMaProgram = getManager().getStudyProgramByName("Ma in het Drama - Acteren");
-		draActMaProgram.setGroups(draActMA);
-		getManager().saveStudyProgram(draActMaProgram);
-		studyProgrammes.add(draActMaProgram);
-
-		StudyProgram draReg1Program = getManager().getStudyProgramByName("1 Ba in het Drama - Regie");
-		draReg1Program.setGroups(draReg1);
-		getManager().saveStudyProgram(draReg1Program);
-		studyProgrammes.add(draReg1Program);
-
-		StudyProgram draReg2Program = getManager().getStudyProgramByName("2 Ba in het Drama - Regie");
-		draReg2Program.setGroups(draReg2);
-		getManager().saveStudyProgram(draReg2Program);
-		studyProgrammes.add(draReg2Program);
-
-		StudyProgram draReg3Program = getManager().getStudyProgramByName("3 Ba in het Drama - Regie");
-		draReg3Program.setGroups(draReg3);
-		getManager().saveStudyProgram(draReg3Program);
-		studyProgrammes.add(draReg3Program);
-
-		StudyProgram draRegMaProgram = getManager().getStudyProgramByName("Ma in het Drama - Regie");
-		draRegMaProgram.setGroups(draRegMA);
-		getManager().saveStudyProgram(draRegMaProgram);
-		studyProgrammes.add(draRegMaProgram);
-
-		StudyProgram akRadio1Program = getManager().getStudyProgramByName("1 Ba AK - Radio");
-		akRadio1Program.addGroup(akRadio1);
-		getManager().saveStudyProgram(akRadio1Program);
-		studyProgrammes.add(akRadio1Program);
-
-		StudyProgram akASS1Program = getManager().getStudyProgramByName("1 Ba in de Audiovisuele Kunsten - ASS");
-		akASS1Program.addGroup(akASS1);
-		getManager().saveStudyProgram(akASS1Program);
-		studyProgrammes.add(akASS1Program);
-
-		StudyProgram akASS2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - ASS");
-		akASS2Program.addGroup(akASS2);
-		getManager().saveStudyProgram(akASS2Program);
-		studyProgrammes.add(akASS2Program);
-
-		StudyProgram akRadio2Program = getManager().getStudyProgramByName("2 Ba AK - Radio");
-		akRadio2Program.addGroup(akRadio2);
-		getManager().saveStudyProgram(akRadio2Program);
-		studyProgrammes.add(akRadio2Program);
-
-		StudyProgram akB2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Beeld");
-		akB2Program.addGroup(akB2);
-		getManager().saveStudyProgram(akB2Program);
-		studyProgrammes.add(akB2Program);
-
-		StudyProgram akG2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Geluid");
-		akG2Program.addGroup(akG2);
-		getManager().saveStudyProgram(akG2Program);
-		studyProgrammes.add(akG2Program);
-
-		StudyProgram akM2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Montage");
-		akM2Program.addGroup(akM2);
-		getManager().saveStudyProgram(akM2Program);
-		studyProgrammes.add(akM2Program);
-
-		StudyProgram akRadio3Program = getManager().getStudyProgramByName("3 Ba AK - Radio");
-		akRadio3Program.addGroup(akRadio3);
-		getManager().saveStudyProgram(akRadio3Program);
-		studyProgrammes.add(akRadio3Program);
-
-		StudyProgram akASS3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - ASS");
-		akASS3Program.addGroup(akASS3);
-		getManager().saveStudyProgram(akASS3Program);
-		studyProgrammes.add(akASS3Program);
-
-		StudyProgram akB3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Beeld");
-		akB3Program.addGroup(akB3);
-		getManager().saveStudyProgram(akB3Program);
-		studyProgrammes.add(akB3Program);
-
-		StudyProgram akG3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Geluid");
-		akG3Program.addGroup(akG3);
-		getManager().saveStudyProgram(akG3Program);
-		studyProgrammes.add(akG3Program);
-
-		StudyProgram akM3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - Montage");
-		akM3Program.addGroup(akM3);
-		getManager().saveStudyProgram(akM3Program);
-		studyProgrammes.add(akM3Program);
 
 		threadPool = new ArrayList<Thread>();
 		for (int week = startSyncWeek; week <= endSyncWeek; week++) {
