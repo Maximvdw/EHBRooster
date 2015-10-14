@@ -340,6 +340,76 @@ public class EHBRooster {
 		akF3.setEducation(ak3EDU);
 		akF3.setAlias("3 Ba AK - Film");
 		groups.add(akF3);
+		Education akMAEDU = getManager().createEducation("Ma Audiovisuele Kunsten", "RITCS");
+		// Get Animatiefilm
+		Group akAN1 = getManager().getGroupByName("1/Ba AN-R-P"); // OK
+		akAN1.setName("1/Ba AN-R-P");
+		akAN1.setEducation(ak1EDU);
+		akAN1.setAlias("1 Ba AK - Animatiefilm");
+		groups.add(akAN1);
+		Group akAN2 = getManager().getGroupByName("2/Ba AN-R-P"); // OK
+		akAN2.setName("2/Ba AN-R-P");
+		akAN2.setEducation(ak2EDU);
+		akAN2.setAlias("2 Ba AK - Animatiefilm");
+		groups.add(akAN2);
+		Group akAN3 = getManager().getGroupByName("3/Ba AN-R-P"); // OK
+		akAN3.setName("3/Ba AN-R-P");
+		akAN3.setEducation(ak3EDU);
+		akAN3.setAlias("3 Ba AK - Animatiefilm");
+		groups.add(akAN3);
+		Group akANMA = getManager().getGroupByName("Ma AN"); // OK
+		akANMA.setEducation(akMAEDU);
+		akANMA.setAlias("Ma AK - Animatiefilm");
+		groups.add(akANMA);
+		// Get 1st year Sociaal Werk
+		List<Group> draSW1 = getManager().getGroupsByName("1/SW-MW");
+		Education draSW1EDU = getManager().createEducation("1 Ba Sociaal Werk", "MMM");
+		for (Group g : draSW1) {
+			g.setEducation(draSW1EDU);
+		}
+		groups.addAll(draSW1);
+		// Get 2nd year Sociaal Werk
+		List<Group> draSWMW2 = getManager().getGroupsByName("2/SW-MW");
+		Education draSWMW2EDU = getManager().createEducation("2 Ba Sociaal Werk - MW", "MMM");
+		for (Group g : draSWMW2) {
+			g.setEducation(draSWMW2EDU);
+		}
+		groups.addAll(draSWMW2);
+
+		List<Group> draSWSCW2 = getManager().getGroupsByName("2/SW-SCW");
+		Education draSWSCW2EDU = getManager().createEducation("2 Ba Sociaal Werk - SCW", "MMM");
+		for (Group g : draSWSCW2) {
+			g.setEducation(draSWSCW2EDU);
+		}
+		groups.addAll(draSWSCW2);
+
+		List<Group> draSWSJD2 = getManager().getGroupsByName("2/SW-SJD");
+		Education draSWSJD2EDU = getManager().createEducation("2 Ba Sociaal Werk - MA", "MMM");
+		for (Group g : draSWSJD2) {
+			g.setEducation(draSWSJD2EDU);
+		}
+		groups.addAll(draSWSJD2);
+		// Get 3rd year Sociaal Werk
+		List<Group> draSWMW3 = getManager().getGroupsByName("3/SW-MW");
+		Education draSWMW3EDU = getManager().createEducation("3 Ba Sociaal Werk - MW", "MMM");
+		for (Group g : draSWMW3) {
+			g.setEducation(draSWMW3EDU);
+		}
+		groups.addAll(draSWMW3);
+
+		List<Group> draSWSCW3 = getManager().getGroupsByName("3/SW-SCW");
+		Education draSWSCW3EDU = getManager().createEducation("3 Ba Sociaal Werk - SCW", "MMM");
+		for (Group g : draSWSCW3) {
+			g.setEducation(draSWSCW3EDU);
+		}
+		groups.addAll(draSWSCW3);
+
+		List<Group> draSWSJD3 = getManager().getGroupsByName("3/SW-SJD");
+		Education draSWSJD3EDU = getManager().createEducation("3 Ba Sociaal Werk - MA", "MMM");
+		for (Group g : draSWSJD3) {
+			g.setEducation(draSWSJD3EDU);
+		}
+		groups.addAll(draSWSJD3);
 
 		Console.info("Preparing to get timetables for " + groups.size() + " groups ...");
 		Console.info("Creating cache of all subjects ...");
@@ -355,7 +425,7 @@ public class EHBRooster {
 			Console.info("Saving group: " + group.getName());
 			getManager().saveGroup(group);
 		}
-		
+
 		final List<StudyProgram> studyProgrammes = new ArrayList<StudyProgram>();
 		StudyProgram podium1 = getManager().getStudyProgramByName("1 Ba Podiumtechnieken");
 		podium1.setGroups(pt1);
@@ -426,6 +496,11 @@ public class EHBRooster {
 		akD1Program.addGroup(akD1);
 		getManager().saveStudyProgram(akD1Program);
 		studyProgrammes.add(akD1Program);
+		
+		StudyProgram akAN1Program = getManager().getStudyProgramByName("1 Ba AK - Animatiefilm");
+		akAN1Program.addGroup(akAN1);
+		getManager().saveStudyProgram(akAN1Program);
+		studyProgrammes.add(akAN1Program);
 
 		StudyProgram akASS2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - ASS");
 		akASS2Program.addGroup(akASS2);
@@ -436,6 +511,11 @@ public class EHBRooster {
 		akRadio2Program.addGroup(akRadio2);
 		getManager().saveStudyProgram(akRadio2Program);
 		studyProgrammes.add(akRadio2Program);
+		
+		StudyProgram akAN2Program = getManager().getStudyProgramByName("2 Ba AK - Animatiefilm");
+		akAN2Program.addGroup(akAN2);
+		getManager().saveStudyProgram(akAN2Program);
+		studyProgrammes.add(akAN2Program);
 
 		StudyProgram akB2Program = getManager().getStudyProgramByName("2 Ba in de Audiovisuele Kunsten - Beeld");
 		akB2Program.addGroup(akB2);
@@ -461,6 +541,11 @@ public class EHBRooster {
 		akRadio3Program.addGroup(akRadio3);
 		getManager().saveStudyProgram(akRadio3Program);
 		studyProgrammes.add(akRadio3Program);
+		
+		StudyProgram akAN3Program = getManager().getStudyProgramByName("3 Ba AK - Animatiefilm");
+		akAN3Program.addGroup(akAN3);
+		getManager().saveStudyProgram(akAN3Program);
+		studyProgrammes.add(akAN3Program);
 
 		StudyProgram akASS3Program = getManager().getStudyProgramByName("3 Ba in de Audiovisuele Kunsten - ASS");
 		akASS3Program.addGroup(akASS3);
@@ -502,6 +587,10 @@ public class EHBRooster {
 		getManager().saveStudyProgram(akD3Program);
 		studyProgrammes.add(akD3Program);
 		
+		StudyProgram akANMAProgram = getManager().getStudyProgramByName("Ma AK - Animatiefilm");
+		akANMAProgram.addGroup(akANMA);
+		getManager().saveStudyProgram(akANMAProgram);
+		studyProgrammes.add(akANMAProgram);
 
 		List<Thread> threadPool = new ArrayList<Thread>();
 		for (int week = startSyncWeek; week <= endSyncWeek; week++) {
@@ -568,7 +657,6 @@ public class EHBRooster {
 				}
 			}
 		}
-
 
 		threadPool = new ArrayList<Thread>();
 		for (int week = startSyncWeek; week <= endSyncWeek; week++) {
