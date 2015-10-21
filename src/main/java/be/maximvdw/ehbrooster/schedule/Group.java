@@ -71,7 +71,7 @@ public class Group {
 		subjects.clear();
 		List<Subject> subjects = ScheduleManager.getInstance().getSubjects(force);
 		for (Subject subject : subjects) {
-			if (subject.getFullName().contains(getName())) {
+			if (subject.getFullName().contains(getName() + "@") || subject.getFullName().contains(getName() + "/")) {
 				this.subjects.add(subject);
 			}
 		}

@@ -752,6 +752,7 @@ public class ScheduleManager {
 		groupName = groupName.replace("LSO/AA ", "");
 		groupName = groupName.replace("LSO/BE ", "");
 		groupName = groupName.replace("/PT", "/Ba PT");
+		groupName = groupName.replace("IIM/", "IIM");
 		return groupName;
 	}
 
