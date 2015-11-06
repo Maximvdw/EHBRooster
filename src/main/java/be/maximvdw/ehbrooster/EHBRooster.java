@@ -35,7 +35,7 @@ public class EHBRooster {
 		int port = Configuration.getInt("port");
 
 		Console.info("=====================================");
-		Console.info(" EHBRooster Converter v1.6");
+		Console.info(" EHBRooster Converter v1.7");
 		Console.info(" (c) Maxim Van de Wynckel 2015-2015");
 		Console.info("=====================================");
 
@@ -213,25 +213,48 @@ public class EHBRooster {
 		groups.addAll(pt3);
 		// Get 1st year Communcatie
 		Education ca1EDU = getManager().createEducation("1 Ba Communicatiemanagement", "MMM");
-		List<Group> ca1 = getManager().getGroupsByName("1/CM");
+		List<Group> ca1 = getManager().getGroupsByName("1/OM");
 		for (Group g : ca1) {
 			g.setEducation(ca1EDU);
 		}
 		groups.addAll(ca1);
 		// Get 2nd year Communcatie
 		Education ca2EDU = getManager().createEducation("2 Ba Communicatiemanagement", "MMM");
-		List<Group> ca2 = getManager().getGroupsByName("2/CM");
+		List<Group> ca2 = getManager().getGroupsByName("2/OM");
 		for (Group g : ca2) {
 			g.setEducation(ca2EDU);
 		}
 		groups.addAll(ca2);
 		// Get 3rd year Communcatie
 		Education ca3EDU = getManager().createEducation("3 Ba Communicatiemanagement", "MMM");
-		List<Group> ca3 = getManager().getGroupsByName("3/CM");
+		List<Group> ca3 = getManager().getGroupsByName("3/OM");
 		for (Group g : ca3) {
 			g.setEducation(ca3EDU);
 		}
 		groups.addAll(ca3);
+		
+		// Get 1st year Communomtie
+		Education om1EDU = getManager().createEducation("1 Ba Communiomtiemanagement", "MMM");
+		List<Group> om1 = getManager().getGroupsByName("1/OM");
+		for (Group g : om1) {
+			g.setEducation(om1EDU);
+		}
+		groups.addAll(om1);
+		// Get 2nd year Communomtie
+		Education om2EDU = getManager().createEducation("2 Ba Office Management", "MMM");
+		List<Group> om2 = getManager().getGroupsByName("2/OM");
+		for (Group g : om2) {
+			g.setEducation(om2EDU);
+		}
+		groups.addAll(om2);
+		// Get 3rd year Communomtie
+		Education om3EDU = getManager().createEducation("3 Ba Office Management", "MMM");
+		List<Group> om3 = getManager().getGroupsByName("3/OM");
+		for (Group g : om3) {
+			g.setEducation(om3EDU);
+		}
+		groups.addAll(om3);
+		
 		// Get 1 AK
 		Education ak1EDU = getManager().createEducation("1 Ba Audiovisuele Kunsten", "RITCS");
 		Group akRadio1 = getManager().getGroupByName("1/Radio"); // OK
@@ -494,13 +517,6 @@ public class EHBRooster {
 			g.setEducation(vp3EDU);
 		}
 		groups.addAll(vp3);
-		// Get 4st year in de Verpleegkunde
-		List<Group> vp4 = getManager().getGroupsByName("4/VP");
-		Education vp4EDU = getManager().createEducation("4 Ba in de Verpleegkunde", "GL");
-		for (Group g : vp4) {
-			g.setEducation(vp4EDU);
-		}
-		groups.addAll(vp4);
 
 		Console.info("Preparing to get timetables for " + groups.size() + " groups ...");
 		Console.info("Creating cache of all subjects ...");
